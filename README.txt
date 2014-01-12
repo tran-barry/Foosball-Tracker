@@ -28,15 +28,28 @@ This application will be done in C#.
 -------------------------------------------------------------------------------
 DATA IMPLEMENTATION
 
-Internally, players will be stored in an ArrayList of player records. Each
-player will have the following structure:
+Internally, players will be stored in a class PlayerList:
+	ArrayList players				A list of 'player' data
+With the following functions:
+	void addWin(int id)				Adds a win for the player specified by id.
+									Also updates winRatio of player
+	void addLoss(int id)			Adds a loss for the player specified by id.
+									Also updates winRatio of player
+	void addPlayer(player entry)	Adds a player to the end of the list
+	void addMatch(int id, int id2)	Adds match 'id2' to player 'id' list of
+									matches, ensuring last match remains -1 for
+									file I/O purposes
+	int getCount()					Returns the number of entries in PlayerList
+									using ArrayList function players.Count
+	player getPlayer(int id)		Returns the player requested by id
+
+Each player will have the following structure:
 	int id					Player's ID (automatically assigned @ creation)
 	string name				Player's name
-	int wins					Player's total wins
+	int wins				Player's total wins
 	int losses				Player's total losses
-	float winRatio			Player's wins divided by total games (1 decimal)
+	int winRatio			Player's wins divided by total games (rounded)
 	ArrayList matches		A list of their matches' IDs
-For file input/output purposes, the last match in 'matches' will always be -1.
 
 Each match will be stored in an ArrayList. They will have this structure:
 	int id					Match's ID (automatically assigned @ creation)
@@ -45,10 +58,10 @@ Each match will be stored in an ArrayList. They will have this structure:
 	int scoreA				The end score of the first player
 	int scoreB				The end score of the second player
 
-Externally, this information will be stored in a .dat file that isn't encoded.
-We will have 2 .dat files - players.dat and matches.dat. Each record will be
-one line of entry in the .dat files. In the case of players.dat, the last entry
-in each line will be -1, to indicate the end of their list of matches.
+Externally, this information will be stored in a .dat file. We will have 2 .dat
+files - players.dat and matches.dat. Each record will be one line of entry in
+the .dat files. In the case of players.dat, the last entry in each line will be
+-1, to indicate the end of their list of matches.
 -------------------------------------------------------------------------------
 PROGRAM FLOW
 
@@ -96,3 +109,83 @@ the user back to the main menu.
 -------------------------------------------------------------------------------
 FUNCTION IMPLEMENTATION
 -------------------------------------------------------------------------------
+public void initialize()
+	- create PlayerList players and ArrayList matches using namespace
+	  "System.Collections"
+	- use the file.Exists method from namespace "System.IO" to see if
+	  players.dat and matches.dat exists
+		- if false, will create these files
+		- if true, will load these values into players and matches
+
+static void Main(string[] args)
+	- calls upon initialize() at start of program
+	- every time the form loads, it will call upon saveData()
+	- displays a form where the user can choose between "Create Player", "View
+	  Player", "Create Match", and "Exit"
+	- Clicking on any button will close the menu form calls upon the function
+	  that the user requested, except for "Exit", which will close the program
+	- Once the task is completed, it will loop back to where the menu form was
+	  viewable by the user.
+
+public void createPlayer()
+	- displays a form where the user can enter in a name as a string
+	- will create new player data with wins, losses, and winRatio set to 0
+	- player.matches will be created as an empty ArrayList
+	- player.id will be determined by PlayerList.getCount()
+	- it will use class function addPlayer(player entry) to add this entry to
+	  the PlayerList
+	- it will open up players.dat in append mode to add this to end of file
+	- it will then close the form, allowing the user to go back to main menu
+
+public void viewPlayer()
+	- First, it will call upon choosePlayer(), where it will return a player
+	  for this function to work with
+	- it will then display this player's statistics in a form as well as a list
+	  of their matches
+	- clicking on a match will disable this form and show a new form with the
+	  statistics of the match
+		- the user will be able to close this form to re-enable the first form
+	- the user can close this form to bring them back to the main menu
+
+public void createMatch()
+	- First, it will call upon choosePlayer(), and store this in player playerA
+	- It'll call upon choosePlayer() again, storing this in player playerB
+		- if playerA == playerB, it'll say "can't choose same player" and bring
+		  the user back to the main menu
+	- It'll then ask for int Ascore and int Bscore
+		- if Ascore == Bscore, or if either score is negative, it'll say
+		  "impossible in a foosball game" and bring the user back to the main
+		  menu
+	- It'll compare the two values to determine who won and who loss
+		- the winning player will use its id in PlayerList.addWin()
+		- the losing player will use its id in PlayerList.addLoss()
+	- It'll find the match id using ArrayList.Count()
+	- It'll create a new match type data structure and add it to the end of
+	  matches using ArrayList.Add()'
+	- Lastly, it'll call upon PlayerList.addMatch() twice to add the match to both
+	  players that was chosen
+
+public player choosePlayer()
+	- First, it'll create 7 new 1-dimensional arrays with size of 
+	  PlayerList.getCount(), called ids, names, wins, losses, winRatio, temp1,
+	  and temp2
+	- starting with id, it'll list all of the information in the arrays except
+	  for temp1 and temp2
+	- clicking on the header of a column will copy that array into temp1 and
+	  temp2
+		- it'll then call upon Array.Sort(temp1, x) where x is the other arrays
+		- once it has sorted x, it'll copy temp2 back into temp 1, so that it 
+		  can repeat the process for the other arrays
+		- Once all five arrays have been sorted, it will then re-display the
+		  information in the arrays
+	- user will be able to select an entry, and upon pressing OK, this function
+	  will return to the original function that called it.
+
+public void saveData()
+	- First, this function will create a file temp1.dat, which will record
+	  everything in PlayerList players (using File.Create())
+	- Next, it will create a file temp2.dat, which will record all the matches
+	  in ArrayList matches (using File.Create())
+	- it will then replace players.dat with temp1.dat using File.Replace()
+	- it will also replace matches.dat with temp2.dat using File.Replace()
+	- it will then delete the temp files using File.Delete()
