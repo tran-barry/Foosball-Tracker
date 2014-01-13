@@ -28,8 +28,9 @@ This application will be done in C#.
 -------------------------------------------------------------------------------
 DATA IMPLEMENTATION
 
-Internally, players will be stored in a class PlayerList:
-	List players					A list of 'player' data
+Internally, players and matches will be stored in a class foosballList:
+	List playerList					A list of 'player' data
+	List matchList					A list of 'match' data
 With the following functions:
 	void initialize()				Creates internal data and creates/loads
 									necessary files
@@ -38,12 +39,18 @@ With the following functions:
 	void addLoss(int id)			Adds a loss for the player specified by id.
 									Also updates winRatio of player
 	void addPlayer(player entry)	Adds a player to the end of the list
-	void addMatch(int id, int id2)	Adds match 'id2' to player 'id' list of
-									matches, ensuring last match remains -1 for
-									file I/O purposes
-	int getCount()					Returns the number of entries in PlayerList
-									using List function players.Count
-	player getPlayer(int id)		Returns the player requested by id
+	void addMatch(int id, int id2, match entry)	
+									Adds match 'entry' to player 'id' and 'id2'
+									list of matches, ensuring last match
+									remains -1 for file I/O purposes
+	void saveData()					Updates players.dat and matches.dat with
+									what's in playerList and matchList
+	player getPlayer(int id)		Returns the player at location id
+	int playerCount()				Returns number of players in file
+	match getMatch(int id)			Returns the match at location id
+	int matchCount()				Returns the number of matches in file
+	int playerMatchCount(int id)	Returns the number of matches player 'id'
+									has
 
 Each player will have the following structure:
 	int id					Player's ID (automatically assigned @ creation)
@@ -164,7 +171,7 @@ public void createMatch()
 	- It'll find the match id using List.Count()
 	- It'll create a new match type data structure and add it to the end of
 	  matches using List.Add()'
-	- Lastly, it'll call upon PlayerList.addMatch() twice to add the match to both
+	- Lastly, it'll call upon PlayerList.addMatch() to add the match to both
 	  players that was chosen
 
 public player choosePlayer()

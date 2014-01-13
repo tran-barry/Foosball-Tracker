@@ -33,13 +33,14 @@
             this.CreateMatchButton = new System.Windows.Forms.Button();
             this.ExitButton = new System.Windows.Forms.Button();
             this.MainLabel = new System.Windows.Forms.Label();
+            this.imageLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // CreatePlayerButton
             // 
-            this.CreatePlayerButton.Location = new System.Drawing.Point(119, 116);
+            this.CreatePlayerButton.Location = new System.Drawing.Point(119, 111);
             this.CreatePlayerButton.Name = "CreatePlayerButton";
-            this.CreatePlayerButton.Size = new System.Drawing.Size(194, 35);
+            this.CreatePlayerButton.Size = new System.Drawing.Size(194, 40);
             this.CreatePlayerButton.TabIndex = 0;
             this.CreatePlayerButton.Text = "Create Player";
             this.CreatePlayerButton.UseVisualStyleBackColor = true;
@@ -59,7 +60,7 @@
             // 
             this.CreateMatchButton.Location = new System.Drawing.Point(119, 203);
             this.CreateMatchButton.Name = "CreateMatchButton";
-            this.CreateMatchButton.Size = new System.Drawing.Size(194, 38);
+            this.CreateMatchButton.Size = new System.Drawing.Size(194, 40);
             this.CreateMatchButton.TabIndex = 2;
             this.CreateMatchButton.Text = "Create Match";
             this.CreateMatchButton.UseVisualStyleBackColor = true;
@@ -85,6 +86,15 @@
             this.MainLabel.TabIndex = 4;
             this.MainLabel.Text = "Foosball Tracker v1.0";
             // 
+            // imageLabel
+            // 
+            this.imageLabel.AutoSize = true;
+            this.imageLabel.Location = new System.Drawing.Point(12, 270);
+            this.imageLabel.Name = "imageLabel";
+            this.imageLabel.Size = new System.Drawing.Size(156, 13);
+            this.imageLabel.TabIndex = 5;
+            this.imageLabel.Text = "Image from www.cutcaster.com";
+            // 
             // MainMenuForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -92,6 +102,7 @@
             this.BackgroundImage = global::Foosball_Tracker.Properties.Resources.MainMenuBackground;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(449, 295);
+            this.Controls.Add(this.imageLabel);
             this.Controls.Add(this.MainLabel);
             this.Controls.Add(this.ExitButton);
             this.Controls.Add(this.CreateMatchButton);
@@ -112,6 +123,7 @@
         private System.Windows.Forms.Button CreateMatchButton;
         private System.Windows.Forms.Button ExitButton;
         private System.Windows.Forms.Label MainLabel;
+        private System.Windows.Forms.Label imageLabel;
     }
 }
 
