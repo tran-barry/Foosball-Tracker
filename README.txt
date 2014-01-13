@@ -29,8 +29,10 @@ This application will be done in C#.
 DATA IMPLEMENTATION
 
 Internally, players will be stored in a class PlayerList:
-	ArrayList players				A list of 'player' data
+	List players					A list of 'player' data
 With the following functions:
+	void initialize()				Creates internal data and creates/loads
+									necessary files
 	void addWin(int id)				Adds a win for the player specified by id.
 									Also updates winRatio of player
 	void addLoss(int id)			Adds a loss for the player specified by id.
@@ -40,7 +42,7 @@ With the following functions:
 									matches, ensuring last match remains -1 for
 									file I/O purposes
 	int getCount()					Returns the number of entries in PlayerList
-									using ArrayList function players.Count
+									using List function players.Count
 	player getPlayer(int id)		Returns the player requested by id
 
 Each player will have the following structure:
@@ -49,9 +51,9 @@ Each player will have the following structure:
 	int wins				Player's total wins
 	int losses				Player's total losses
 	int winRatio			Player's wins divided by total games (rounded)
-	ArrayList matches		A list of their matches' IDs
+	List matches			A list of their matches' IDs
 
-Each match will be stored in an ArrayList. They will have this structure:
+Each match will be stored in an	List. They will have this structure:
 	int id					Match's ID (automatically assigned @ creation)
 	int playerA				The ID of the first player in the match
 	int playerB				The ID of the second player in the match
@@ -67,7 +69,7 @@ PROGRAM FLOW
 
 At the application start, it will first initialize. At first, it will look for
 the .dat files, and create new ones if they can't be found. After, it will
-create the ArrayList for players and matches, loading the data from the files
+create the List for players and matches, loading the data from the files
 if there is data there. From there, it will go into the main menu.
 
 At the main menu, there will be four options:
@@ -110,7 +112,7 @@ the user back to the main menu.
 FUNCTION IMPLEMENTATION
 -------------------------------------------------------------------------------
 public void initialize()
-	- create PlayerList players and ArrayList matches using namespace
+	- create PlayerList players and List matches using namespace
 	  "System.Collections"
 	- use the file.Exists method from namespace "System.IO" to see if
 	  players.dat and matches.dat exists
@@ -130,7 +132,7 @@ static void Main(string[] args)
 public void createPlayer()
 	- displays a form where the user can enter in a name as a string
 	- will create new player data with wins, losses, and winRatio set to 0
-	- player.matches will be created as an empty ArrayList
+	- player.matches will be created as an empty List
 	- player.id will be determined by PlayerList.getCount()
 	- it will use class function addPlayer(player entry) to add this entry to
 	  the PlayerList
@@ -159,9 +161,9 @@ public void createMatch()
 	- It'll compare the two values to determine who won and who loss
 		- the winning player will use its id in PlayerList.addWin()
 		- the losing player will use its id in PlayerList.addLoss()
-	- It'll find the match id using ArrayList.Count()
+	- It'll find the match id using List.Count()
 	- It'll create a new match type data structure and add it to the end of
-	  matches using ArrayList.Add()'
+	  matches using List.Add()'
 	- Lastly, it'll call upon PlayerList.addMatch() twice to add the match to both
 	  players that was chosen
 
@@ -185,7 +187,7 @@ public void saveData()
 	- First, this function will create a file temp1.dat, which will record
 	  everything in PlayerList players (using File.Create())
 	- Next, it will create a file temp2.dat, which will record all the matches
-	  in ArrayList matches (using File.Create())
+	  in List matches (using File.Create())
 	- it will then replace players.dat with temp1.dat using File.Replace()
 	- it will also replace matches.dat with temp2.dat using File.Replace()
 	- it will then delete the temp files using File.Delete()
