@@ -83,7 +83,7 @@ namespace Foosball_Tracker
                 bw.Close();
                 bw1 = new BinaryWriter(new FileStream("matches.dat", FileMode.Create));
                 bw1.Close();
-                MessageBox.Show("Created new files.");
+                MessageBox.Show("Created necessary .dat files.");
             }
         }
         static public void addWin(int id)

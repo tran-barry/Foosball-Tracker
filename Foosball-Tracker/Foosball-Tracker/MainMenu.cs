@@ -61,8 +61,12 @@ namespace Foosball_Tracker
 
         private void ClearDataButton_Click(object sender, EventArgs e)
         {
-            foosballList.clearData();
-            MessageBox.Show("All players and matches have been erased.");
+            if (MessageBox.Show("Are you sure you want to erase all data?",
+                "Barry's Foosball Tracker", MessageBoxButtons.YesNo,MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                foosballList.clearData();
+                MessageBox.Show("All players and matches have been erased.");
+            }
         }
     }
 }
