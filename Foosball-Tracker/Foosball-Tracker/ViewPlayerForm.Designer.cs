@@ -33,7 +33,7 @@
             // 
             // OKButton
             // 
-            this.OKButton.Location = new System.Drawing.Point(181, 210);
+            this.OKButton.Location = new System.Drawing.Point(172, 139);
             this.OKButton.Name = "OKButton";
             this.OKButton.Size = new System.Drawing.Size(75, 23);
             this.OKButton.TabIndex = 0;
@@ -45,10 +45,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(259, 174);
             this.Controls.Add(this.OKButton);
             this.Name = "ViewPlayerForm";
             this.Text = "Barry\'s Foosball Tracker";
+            this.Load += new System.EventHandler(this.ViewPlayerForm_Load);
             this.ResumeLayout(false);
 
         }
@@ -56,5 +57,6 @@
         #endregion
 
         private System.Windows.Forms.Button OKButton;
+
     }
 }

@@ -34,6 +34,7 @@
             this.ExitButton = new System.Windows.Forms.Button();
             this.MainLabel = new System.Windows.Forms.Label();
             this.imageLabel = new System.Windows.Forms.Label();
+            this.ClearDataButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // CreatePlayerButton
@@ -95,6 +96,16 @@
             this.imageLabel.TabIndex = 5;
             this.imageLabel.Text = "Image from www.cutcaster.com";
             // 
+            // ClearDataButton
+            // 
+            this.ClearDataButton.Location = new System.Drawing.Point(352, 203);
+            this.ClearDataButton.Name = "ClearDataButton";
+            this.ClearDataButton.Size = new System.Drawing.Size(85, 40);
+            this.ClearDataButton.TabIndex = 6;
+            this.ClearDataButton.Text = "CLEAR DATA";
+            this.ClearDataButton.UseVisualStyleBackColor = true;
+            this.ClearDataButton.Click += new System.EventHandler(this.ClearDataButton_Click);
+            // 
             // MainMenuForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -102,6 +113,7 @@
             this.BackgroundImage = global::Foosball_Tracker.Properties.Resources.MainMenuBackground;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(449, 295);
+            this.Controls.Add(this.ClearDataButton);
             this.Controls.Add(this.imageLabel);
             this.Controls.Add(this.MainLabel);
             this.Controls.Add(this.ExitButton);
@@ -110,7 +122,6 @@
             this.Controls.Add(this.CreatePlayerButton);
             this.Name = "MainMenuForm";
             this.Text = "Barry\'s Foosball Tracker";
-            this.Load += new System.EventHandler(this.MainMenu_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -124,6 +135,7 @@
         private System.Windows.Forms.Button ExitButton;
         private System.Windows.Forms.Label MainLabel;
         private System.Windows.Forms.Label imageLabel;
+        private System.Windows.Forms.Button ClearDataButton;
     }
 }
 

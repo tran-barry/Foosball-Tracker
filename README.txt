@@ -45,6 +45,8 @@ With the following functions:
 									remains -1 for file I/O purposes
 	void saveData()					Updates players.dat and matches.dat with
 									what's in playerList and matchList
+	void clearData()				Deletes all current entries in playerList
+									and matchList
 	player getPlayer(int id)		Returns the player at location id
 	int playerCount()				Returns number of players in file
 	match getMatch(int id)			Returns the match at location id
@@ -139,11 +141,9 @@ static void Main(string[] args)
 public void createPlayer()
 	- displays a form where the user can enter in a name as a string
 	- will create new player data with wins, losses, and winRatio set to 0
-	- player.matches will be created as an empty List
-	- player.id will be determined by PlayerList.getCount()
+	- player.matches will be empty
 	- it will use class function addPlayer(player entry) to add this entry to
 	  the PlayerList
-	- it will open up players.dat in append mode to add this to end of file
 	- it will then close the form, allowing the user to go back to main menu
 
 public void viewPlayer()

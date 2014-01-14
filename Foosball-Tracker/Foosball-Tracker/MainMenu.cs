@@ -19,67 +19,50 @@ namespace Foosball_Tracker
             InitializeComponent();
         }
 
-        private void MainMenu_Load(object sender, EventArgs e)
-        {
-            
-        }
-
         private void CreatePlayer_Click(object sender, EventArgs e)
         {
             // Create and show the CreatePlayerForm
             CreatePlayerForm createPlayer = new CreatePlayerForm();
             createPlayer.ShowDialog();
-
-            // create new player
-            player dummyPlayer = new player();
-            dummyPlayer.name = "Barry";
-            dummyPlayer.wins = 10;
-            dummyPlayer.losses = 0;
-            dummyPlayer.winRatio = 100;
-            dummyPlayer.matches.Add(0);
-            dummyPlayer.matches.Add(1);
-            dummyPlayer.matches.Add(3);
-            dummyPlayer.matches.Add(17);
-
-            foosballList.addPlayer(dummyPlayer);
-            MessageBox.Show("added dummy player");
-
-            foosballList.saveData();
         }
 
         private void ViewPlayer_Click(object sender, EventArgs e)
         {
-            // Create and show the ViewPlayerForm
-            ViewPlayerForm viewPlayer = new ViewPlayerForm();
-            viewPlayer.ShowDialog();
-
-            player dummyPlayer = new player();
-            string myStr;
-            for (int i = 0; i < foosballList.playerCount(); i++)
+            if (foosballList.playerCount() != 0)
             {
-                dummyPlayer = foosballList.getPlayer(i);
-                myStr = dummyPlayer.name;
-                myStr = myStr + " wins: " + dummyPlayer.wins.ToString();
-                myStr = myStr + " losses: " + dummyPlayer.losses.ToString();
-                myStr = myStr + " winRatio: " + dummyPlayer.winRatio.ToString();
-                for (int j = 0; j < dummyPlayer.matches.Count() - 1; j++)
-                {
-                    myStr = myStr + "\nmatch: " + j.ToString() + ": " + dummyPlayer.matches[j];
-                }
-                MessageBox.Show(myStr);
+                // Create and show the ViewPlayerForm
+                ViewPlayerForm viewPlayer = new ViewPlayerForm();
+                viewPlayer.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("You need to create a player first!");
             }
         }
 
         private void CreateMatch_Click(object sender, EventArgs e)
         {
-            // Create and show the CreateMatchForm
-            CreateMatchForm createMatch = new CreateMatchForm();
-            createMatch.ShowDialog();
+            if (foosballList.playerCount() > 1)
+            {
+                // Create and show the CreateMatchForm
+                CreateMatchForm createMatch = new CreateMatchForm();
+                createMatch.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("There must be at least two players to create a match");
+            }
         }
 
         private void ExitProgram_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void ClearDataButton_Click(object sender, EventArgs e)
+        {
+            foosballList.clearData();
+            MessageBox.Show("All players and matches have been erased.");
         }
     }
 }

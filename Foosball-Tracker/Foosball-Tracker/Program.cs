@@ -30,9 +30,10 @@ namespace Foosball_Tracker
 
                 // use binary reader to load data into playerList
                 br = new BinaryReader(new FileStream("players.dat", FileMode.Open));
-                entry1 = new player();
                 while(br.BaseStream.Position != br.BaseStream.Length)
                 {
+                    // make sure you're working with a new 'player'
+                    entry1 = new player();
                     // first load the name, then wins, then losses, then winRatio
                     entry1.name = br.ReadString();
                     entry1.wins = br.ReadInt32();
@@ -40,7 +41,6 @@ namespace Foosball_Tracker
                     entry1.winRatio = br.ReadInt32();
                     // then, make sure all the matches are clear before loading them
                     i = 0;
-                    entry1.matches.Clear();
                     // then, until you see match "-1", keep loading matches to this player entry
                     while (i != -1)
                     {
@@ -54,9 +54,9 @@ namespace Foosball_Tracker
 
                 // use binary reader to load data into matchList
                 br = new BinaryReader(new FileStream("matches.dat", FileMode.Open));
-                entry2 = new match();
                 while(br.BaseStream.Position != br.BaseStream.Length)
                 {
+                    entry2 = new match();
                     entry2.playerA = br.ReadInt32();
                     entry2.playerB = br.ReadInt32();
                     entry2.scoreA = br.ReadInt32();
@@ -83,7 +83,7 @@ namespace Foosball_Tracker
                 bw.Close();
                 bw1 = new BinaryWriter(new FileStream("matches.dat", FileMode.Create));
                 bw1.Close();
-                MessageBox.Show("No previous data found. Created new files.");
+                MessageBox.Show("Created new files.");
             }
         }
         static public void addWin(int id)
@@ -139,7 +139,6 @@ namespace Foosball_Tracker
             int i, j;
             player entry1;
             match entry2;
-            MessageBox.Show("Data saved! (not really)");
 
             // delete temp1.dat and temp2.dat, if it exists
             if(File.Exists("temp1.dat"))
@@ -188,6 +187,12 @@ namespace Foosball_Tracker
             // Now replace players.dat with temp1.dat and matches.dat with temp2.dat
             File.Copy("temp1.dat", "players.dat", true);
             File.Copy("temp2.dat", "matches.dat", true);
+        }
+        static public void clearData()
+        {
+            playerList.Clear();
+            matchList.Clear();
+            foosballList.saveData();
         }
         static public player getPlayer(int id)
         {
