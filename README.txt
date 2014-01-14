@@ -5,7 +5,7 @@ BARRY'S FOOSBALL TRACKER
 *******************************************************************************
 VERSION HISTORY
 
-2013/01/10	V1.0 - Initial prototype of foosball tracker
+2013/01/14	V1.0 - Initial prototype of foosball tracker
 -------------------------------------------------------------------------------
 DESCRIPTION
 
@@ -28,6 +28,9 @@ This application will be done in C#.
 -------------------------------------------------------------------------------
 DATA IMPLEMENTATION
 
+Player and Match "id" will be based on its position in playerList
+and matchList.
+
 Internally, players and matches will be stored in a class foosballList:
 	List playerList					A list of 'player' data
 	List matchList					A list of 'match' data
@@ -35,14 +38,17 @@ With the following functions:
 	void initialize()				Creates internal data and creates/loads
 									necessary files
 	void addWin(int id)				Adds a win for the player specified by id.
-									Also updates winRatio of player
+									Also updates the winRatio of player
 	void addLoss(int id)			Adds a loss for the player specified by id.
-									Also updates winRatio of player
-	void addPlayer(player entry)	Adds a player to the end of the list
-	void addMatch(int id, int id2, match entry)	
-									Adds match 'entry' to player 'id' and 'id2'
-									list of matches, ensuring last match
-									remains -1 for file I/O purposes
+									Also updates the winRatio of player
+	void addPlayer(player entry)	Adds a player to the end of the list. Makes
+									sure to also add match "-1" for file I/O
+									purposes
+	void addMatch(match entry)		Adds match 'entry' to the players that were
+									in this match, ensuring the last match is
+									"-1" for file I/O purposes. Also determines
+									who won and lost based on match record, and
+									updates accordingly.
 	void saveData()					Updates players.dat and matches.dat with
 									what's in playerList and matchList
 	void clearData()				Deletes all current entries in playerList
@@ -53,9 +59,13 @@ With the following functions:
 	int matchCount()				Returns the number of matches in file
 	int playerMatchCount(int id)	Returns the number of matches player 'id'
 									has
+	int getPlayerMatch(int player, int id)
+									Returns the player's "id"th match (ie if
+									the second match player 5 participated in
+									was match #9, calling getPlayerMatch(5, 2)
+									will return 9)
 
 Each player will have the following structure:
-	int id					Player's ID (automatically assigned @ creation)
 	string name				Player's name
 	int wins				Player's total wins
 	int losses				Player's total losses
@@ -63,16 +73,14 @@ Each player will have the following structure:
 	List matches			A list of their matches' IDs
 
 Each match will be stored in an	List. They will have this structure:
-	int id					Match's ID (automatically assigned @ creation)
 	int playerA				The ID of the first player in the match
 	int playerB				The ID of the second player in the match
 	int scoreA				The end score of the first player
 	int scoreB				The end score of the second player
 
 Externally, this information will be stored in a .dat file. We will have 2 .dat
-files - players.dat and matches.dat. Each record will be one line of entry in
-the .dat files. In the case of players.dat, the last entry in each line will be
--1, to indicate the end of their list of matches.
+files - players.dat and matches.dat. In the case of players.dat, the last entry
+for a player will be -1, to indicate the end of their list of matches.
 -------------------------------------------------------------------------------
 PROGRAM FLOW
 
@@ -85,112 +93,103 @@ At the main menu, there will be four options:
 	Create Player			Allows user to add a new player to the application
 	View Player				Allows user to view a player's matches
 	Create Match			Allows user to add a new match to the application
+	Clear Data				Allows user to wipe all the current records
 	Exit					Exits the program
 With the exception of 'Exit', each option will bring the user back to the menu
 at the end. Also, 'View Player' will be disabled if there isn't at least one
 player in the player list. Create Match will also be disabled if there isn't at
 least two players in the player list.
 
-Creating a player will get the name of the new player from the user. After, it
-will generate an ID for the player (first registered player will have id 0,
-second registered player will have id 1, ... nth registerd player will have id
-n-1) and set all their statistics to 0. It will then add the entry to the end
-of players.dat and bring the user back to the main menu.
+Creating a player will get the name of the new player from the user. It will 
+create a new record with all their statistics set to 0. It will then add the
+entry to the end of playerList, and update the files to match these records.
 
 Viewing a player will have the user choose a player from the list of players
 available. In this area, the user will also be able to sort user by any of the
 statistics we keep track of (id, name, wins, losses, winRatio). Once they
 choose a player, it will display their statistics as well as a list of the
 matches they have been in (by match id). Here, the player may click on a match
-or choose to go back to the main menu. Clicking on a match id will bring the
-user to the match record, where it will display the players in the matches as
-well as the final score. It will then bring the user back to the player's
+or choose to go back to the main menu. Double-clicking on a match id will bring
+the user to the match record, where it will display the players in the matches
+as well as the final score. It will then bring the user back to the player's
 statistics.
 
-Creating a match will first have the user choose player A and then player B
-from the list of players available. If playerA == playerB, then it will ask the
-user to choose a different playerB. It will then ask for playerA's score and
-playerB's score. It will then determine who won based on the score. It will
-then create the match, append it to the end of matches.dat, and update
-players.dat with this information. To do this, it will create a temp.dat, copy
-each line from players.dat into temp.dat except for the two players with
-updated records (it will put their new record in). After, it will delete 
-players.dat and rename temp.dat as players.dat. Once this is done, it will take
-the user back to the main menu.
+Creating a match will bring up a form where the user can choose which players
+participated as well as their scores. If the user selected the same player, one
+of the scores isn't 10, or if it's a tie (which is physically impossible in
+foosball), it'll prompt the user to enter a valid value. If all the values are
+valid, it will create the match and ensure both player records have it in their
+match history. It'll also calculate who won/loss, and update the player's win
+ratios.
+
+Clearing data will prompt the user with a dialog box asking if they're sure. If
+they hit yes, then all the data stored on the computer will be cleared.
 -------------------------------------------------------------------------------
 FUNCTION IMPLEMENTATION
 -------------------------------------------------------------------------------
-public void initialize()
-	- create PlayerList players and List matches using namespace
-	  "System.Collections"
-	- use the file.Exists method from namespace "System.IO" to see if
-	  players.dat and matches.dat exists
-		- if false, will create these files
-		- if true, will load these values into players and matches
+static void Main()
+	- First, it'll initialize the program
+		- create PlayerList players and List matches using namespace
+		  "System.Collections"
+		- use the file.Exists method from namespace "System.IO" to see if
+		  players.dat and matches.dat exists
+			- if one or more of these files are missing, it'll delete any
+			  leftover files and make new ones
+			- if true, will load these values into players and matches
 
-static void Main(string[] args)
-	- calls upon initialize() at start of program
-	- every time the form loads, it will call upon saveData()
+mainMenuForm
 	- displays a form where the user can choose between "Create Player", "View
-	  Player", "Create Match", and "Exit"
-	- Clicking on any button will close the menu form calls upon the function
-	  that the user requested, except for "Exit", which will close the program
-	- Once the task is completed, it will loop back to where the menu form was
-	  viewable by the user.
+	  Player", "Create Match", "Clear Data", and "Exit"
+	- Clicking on any button will bring up a new form based on what the user
+	  wants to do.
+	- If there isn't at least already one player created in records, "View
+	  Player" will be disabled
+	- If there isn't at least two players created in records, "Create Match"
+	  will be disabled
+	- "Exit" will exit the program. Any other command will let the user
+	  take more actions after they're done the current action
 
-public void createPlayer()
+createPlayerForm
 	- displays a form where the user can enter in a name as a string
 	- will create new player data with wins, losses, and winRatio set to 0
-	- player.matches will be empty
 	- it will use class function addPlayer(player entry) to add this entry to
 	  the PlayerList
-	- it will then close the form, allowing the user to go back to main menu
+	- it will use saveData() to save the changes, then close the form,
+	  allowing the user to go back to main menu
 
-public void viewPlayer()
-	- First, it will call upon choosePlayer(), where it will return a player
-	  for this function to work with
+viewPlayerForm
+	- First, it will open up choosePlayerForm, and wait for a selection
+		- if the user closes choosePlayerForm without making a selection, this
+		  form will also close
 	- it will then display this player's statistics in a form as well as a list
 	  of their matches
-	- clicking on a match will disable this form and show a new form with the
-	  statistics of the match
-		- the user will be able to close this form to re-enable the first form
+		- if the user has no matches, it'll say so as well as disable the "view
+		  match" button
+	- double-clicking on a match will disable this form and show a new form
+	  with the statistics of the match
+		- the user will be able to close this form to go back to viewPlayerForm
 	- the user can close this form to bring them back to the main menu
 
-public void createMatch()
-	- First, it will call upon choosePlayer(), and store this in player playerA
-	- It'll call upon choosePlayer() again, storing this in player playerB
-		- if playerA == playerB, it'll say "can't choose same player" and bring
-		  the user back to the main menu
-	- It'll then ask for int Ascore and int Bscore
-		- if Ascore == Bscore, or if either score is negative, it'll say
-		  "impossible in a foosball game" and bring the user back to the main
-		  menu
-	- It'll compare the two values to determine who won and who loss
-		- the winning player will use its id in PlayerList.addWin()
-		- the losing player will use its id in PlayerList.addLoss()
-	- It'll find the match id using List.Count()
-	- It'll create a new match type data structure and add it to the end of
-	  matches using List.Add()'
-	- Lastly, it'll call upon PlayerList.addMatch() to add the match to both
-	  players that was chosen
+createMatchForm
+	- It will bring up a form where the user can choose values for players and
+	  scores
+		- User cannot choose the same players
+		- User cannot have a tie in score
+		- One of the scores must be 10
+	- It will then create the match in the records using addMatch(match)
+	- Then, it will use saveData() to save the changes, then close the form,
+	  allowing the user to go back to main menu
 
-public player choosePlayer()
-	- First, it'll create 7 new 1-dimensional arrays with size of 
-	  PlayerList.getCount(), called ids, names, wins, losses, winRatio, temp1,
-	  and temp2
-	- starting with id, it'll list all of the information in the arrays except
-	  for temp1 and temp2
-	- clicking on the header of a column will copy that array into temp1 and
-	  temp2
-		- it'll then call upon Array.Sort(temp1, x) where x is the other arrays
-		- once it has sorted x, it'll copy temp2 back into temp 1, so that it 
-		  can repeat the process for the other arrays
-		- Once all five arrays have been sorted, it will then re-display the
-		  information in the arrays
-	- user will be able to select an entry, and upon pressing OK, this function
-	  will return to the original function that called it.
+choosePlayerForm
+	- It will load all the entries already in playerList using dataGridView
+	- Because we're using dataGridView, you can already sort the data in the
+	  table
+	- double clicking an entry or selecting OK will save the id where
+	  viewPlayerForm can access it
+	- if the user closes the form without making a selection, then
+	  viewPlayerForm will also close
 
-public void saveData()
+foosballList.saveData()
 	- First, this function will create a file temp1.dat, which will record
 	  everything in PlayerList players (using File.Create())
 	- Next, it will create a file temp2.dat, which will record all the matches
