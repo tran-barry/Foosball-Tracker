@@ -92,7 +92,7 @@ namespace Foosball_Tracker
             player entry = new player();
             entry = playerList[id];
             entry.wins++;
-            entry.winRatio = (int)(entry.wins / (entry.wins + entry.losses) );
+            entry.winRatio = (int)((entry.wins * 100) / (entry.wins + entry.losses) );
 
             // Places the updated player stats into the list, removes the old one from the list
             playerList.Insert(id, entry);
@@ -104,7 +104,7 @@ namespace Foosball_Tracker
             player entry = new player();
             entry = playerList[id];
             entry.losses++;
-            entry.winRatio = (int)(entry.wins / (entry.wins + entry.losses) );
+            entry.winRatio = (int)((entry.wins * 100) / (entry.wins + entry.losses));
 
             // Places the updated player stats into the list, removes the old one from the list
             playerList.Insert(id, entry);
@@ -118,20 +118,32 @@ namespace Foosball_Tracker
             //Adds a player to the end of the list
             playerList.Add(entry);
         }
-        static public void addMatch(int id, int id2, match matchEntry)
+        static public void addMatch(match matchEntry)
         {
             // Adds match 'matchEntry' to player 'id' and 'id2' list of matches, ensuring last match remains -1 for file I/O purposes
             player entry1 = new player();
             player entry2 = new player();
-            entry1 = playerList[id];
-            entry2 = playerList[id2];
+            entry1 = playerList[matchEntry.playerA];
+            entry2 = playerList[matchEntry.playerB];
 
             // add match to the list of matches
             matchList.Add(matchEntry);
 
             // add match id to player entries, making sure that the last match remains at -1
-            entry1.matches.Insert((entry1.matches.Count - 1), matchList.Count());
-            entry2.matches.Insert((entry2.matches.Count - 1), matchList.Count());
+            entry1.matches.Insert(entry1.matches.Count() - 1, matchList.Count() - 1);
+            entry2.matches.Insert(entry2.matches.Count() - 1, matchList.Count() - 1);
+
+            // add a win or a loss to appropriate players
+            if(matchEntry.scoreA > matchEntry.scoreB)
+            {
+                addWin(matchEntry.playerA);
+                addLoss(matchEntry.playerB);
+            }
+            else if (matchEntry.scoreA < matchEntry.scoreB)
+            {
+                addWin(matchEntry.playerB);
+                addLoss(matchEntry.playerA);
+            }
         }
         static public void saveData()
         {
@@ -212,7 +224,12 @@ namespace Foosball_Tracker
         }
         static public int playerMatchCount(int id)
         {
-            return playerList[id].matches.Count();
+            // because there is always a match id of '-1' at end, gotta return 1 less
+            return playerList[id].matches.Count() - 1;
+        }
+        static public int getPlayerMatch(int player, int id)
+        {
+            return playerList[player].matches[id];
         }
     }
     public class player

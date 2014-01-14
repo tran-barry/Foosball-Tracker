@@ -12,6 +12,8 @@ namespace Foosball_Tracker
 {
     public partial class choosePlayerForm : Form
     {
+        // this needs to be accessible by both ViewPlayerForm and CreateMatchForm
+        public static int id;
         public choosePlayerForm()
         {
             InitializeComponent();
@@ -37,16 +39,22 @@ namespace Foosball_Tracker
 
         private void selectButton_Click(object sender, EventArgs e)
         {
-            // First, fine out which row you're on
+            // First, find out which row you're on
             int i = playerGrid.CurrentRow.Index;
 
             // now, using that row, find out what value is in the first cell, which will be the id
             DataGridViewRow selectedRow = playerGrid.Rows[i];
-            ViewPlayerForm.id = Convert.ToInt32(selectedRow.Cells[0].Value);
 
-            string myStr = "You chose player ID: " + Convert.ToString(selectedRow.Cells[0].Value);
-            MessageBox.Show(myStr);
+            // this variable is accessible from other forms
+            choosePlayerForm.id = Convert.ToInt32(selectedRow.Cells[0].Value);
             this.Close();
+        }
+
+        private void playerGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // same thing as clicking the "Select" button
+            selectButton_Click(sender, e);
+
         }
     }
 }

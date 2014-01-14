@@ -47,6 +47,7 @@
             this.playerGrid.ShowEditingIcon = false;
             this.playerGrid.Size = new System.Drawing.Size(565, 272);
             this.playerGrid.TabIndex = 0;
+            this.playerGrid.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.playerGrid_CellDoubleClick);
             // 
             // selectButton
             // 
