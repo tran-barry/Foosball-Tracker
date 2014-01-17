@@ -10,8 +10,17 @@ using System.Windows.Forms;
 
 namespace Foosball_Tracker
 {
+    //
+    // This form displays all of the user's statistics in a window. It'll also show in a
+    // table all the matches they have participated in up until now, which they can open to
+    // take a look at specific matches
+    //
     public partial class ViewPlayerForm : Form
     {
+        //
+        // Before this form opens, it'll bring up the choosePlayerForm. However, if the user
+        // closes the choosePlayerForm without making a selection, it'll also close this form
+        //
         public ViewPlayerForm()
         {
             int id, id2;
@@ -41,16 +50,21 @@ namespace Foosball_Tracker
                 this.lossesLabel.Text = this.lossesLabel.Text + currentPlayer.losses;
                 this.winRatioLabel.Text = this.winRatioLabel.Text + currentPlayer.winRatio;
 
+                // Make a new table. However, if the player hasn't had any matches, it'll
+                // say "no matches played" instead
                 DataTable table = new DataTable();
                 if (foosballList.playerMatchCount(id) != 0)
                 {
                     // Enables the viewMatchForm
                     viewMatchForm.matchId = 0;
 
-                    // Creates the dataTable that the Form will show
+                    // Creates the dataTable that the Form will show, as well as what the column
+                    // headers say
                     table.Columns.Add("Match ID", typeof(int));
                     table.Columns.Add("Versus", typeof(string));
                     table.Columns.Add("Result", typeof(string));
+                    
+                    // Adds each match to the table
                     for (int i = 0; i < foosballList.playerMatchCount(id); i++)
                     {
                         // Find the i'th match of the player
@@ -59,7 +73,7 @@ namespace Foosball_Tracker
                         id2 = foosballList.getPlayerMatch(id, i);
                         currentMatch = foosballList.getMatch(id2);
 
-                        // Find who they played versus, and who won
+                        // Find who they played versus, and the result for the player they're viewing
                         result = null;
                         if (id == currentMatch.playerA)
                         {
@@ -92,7 +106,7 @@ namespace Foosball_Tracker
                 }
                 else
                 {
-                    // Disables the viewMatchForm from working if there's no matches
+                    // The table will say something else if they haven't played any matches
                     viewMatchForm.matchId = -1;
                     table.Columns.Add("No matches played", typeof(string));
                 }
@@ -100,12 +114,16 @@ namespace Foosball_Tracker
                 matchGrid.DataSource = table;
             }
         }
-
+        //
+        // If the user hits OK, it means they're done looking at the player
+        //
         private void OKButton_Click(object sender, EventArgs e)
         {
             this.Close();
         }
-
+        //
+        // Automatically close the window if the user didn't choose anyone in the choosePlayerForm
+        //
         private void ViewPlayerForm_Load(object sender, EventArgs e)
         {
             // if, by the time the form loads, id is still -1, just close this window automatically
@@ -114,12 +132,18 @@ namespace Foosball_Tracker
                 this.Close();
             }
         }
-
+        //
+        // Double-clicking a row is the same thing as clicking on the "View Match" button
+        //
         private void matchGrid_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             viewMatchButton_Click(sender, e);
         }
-
+        //
+        // If there are no matches to look at, it'll give a message box saying so. Otherwise,
+        // it will load the match into viewMathForm.matchId so that the next form can display
+        // the specifics of the match.
+        //
         private void viewMatchButton_Click(object sender, EventArgs e)
         {
             // Only work if there's an actual row of data to be selected
@@ -140,6 +164,7 @@ namespace Foosball_Tracker
             }
             else
             {
+                // Will only reach here if the player has no matches played
                 MessageBox.Show("No matches to view.");
             }
         }

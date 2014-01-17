@@ -7,10 +7,24 @@ using System.Windows.Forms;
 
 namespace Foosball_Tracker
 {
+    //
+    // This class will handle all the operations that require manipulation with
+    // the player and match lists, as well as file I/O
+    //
     static class foosballList
     {
+        //
+        // Only this class may change the values in playerList and matchList
+        //
         static private List<player> playerList;
         static private List<match> matchList;
+        //
+        // Initializes the lists of data in the program. It'll also check for
+        // the .dat files - if they exist, it'll load the values in. If not,
+        // it'll create new files. If one file is missing but not the other,
+        // it'll automatically delete the other file and create new files since
+        // players.dat relies on matches.dat
+        //
         static public void initialize()
         {
             // Creating list of matches and players
@@ -67,6 +81,8 @@ namespace Foosball_Tracker
             }
             else
             {
+                // check to see if one file is missing. Since they rely on each other's data, it'll
+                // delete the other file if only one is in the database
                 BinaryWriter bw, bw1;
                 if (File.Exists("players.dat"))
                 {
@@ -78,7 +94,8 @@ namespace Foosball_Tracker
                     MessageBox.Show("Missing players.dat - deleting matches.dat and recreating files");
                     File.Delete("matches.dat");
                 }
-
+                
+                // create both files
                 bw = new BinaryWriter(new FileStream("players.dat", FileMode.Create));
                 bw.Close();
                 bw1 = new BinaryWriter(new FileStream("matches.dat", FileMode.Create));
@@ -86,6 +103,10 @@ namespace Foosball_Tracker
                 MessageBox.Show("Created necessary .dat files.");
             }
         }
+        //
+        // Adds a win for the player specified by id. Also updates their winRatio and makes sure
+        // the entry in the playerList gets updated
+        //
         static public void addWin(int id)
         {
             // Adds a win for the player specified by id. Also updates winRatio of player
@@ -98,6 +119,10 @@ namespace Foosball_Tracker
             playerList.Insert(id, entry);
             playerList.RemoveAt(id+1);
         }
+        //
+        // Adds a loss for the player specified by id. Also updates their winRatio and makes sure
+        // the entry in the playerList gets updated
+        //
         static public void addLoss(int id)
         {
             // Adds a loss for the player specified by id. Also updates winRatio of player
@@ -110,6 +135,11 @@ namespace Foosball_Tracker
             playerList.Insert(id, entry);
             playerList.RemoveAt(id+1);
         }
+        //
+        // Adds a new player to the end of playerList. It'll also make sure the match list for
+        // the new player has a "-1" match, since this is how the program determines how many matches
+        // a single player participated in when reading from the file
+        //
         static public void addPlayer(player entry)
         {
             //If you're adding a new player, gotta make sure the last match is "-1"
@@ -118,9 +148,15 @@ namespace Foosball_Tracker
             //Adds a player to the end of the list
             playerList.Add(entry);
         }
+        //
+        // adds the match to both matchlist as well as each of the participating player's matches list.
+        // It'll make sure that the last match entry will remain -1 by inserting it right before it for each
+        // player. Lastly, it'll add a win for the person with the higher score, and a loss for the lower
+        // score
+        //
         static public void addMatch(match matchEntry)
         {
-            // Adds match 'matchEntry' to player 'id' and 'id2' list of matches, ensuring last match remains -1 for file I/O purposes
+            // Adds match 'matchEntry' to player A and B's list of matches
             player entry1 = new player();
             player entry2 = new player();
             entry1 = playerList[matchEntry.playerA];
@@ -145,6 +181,11 @@ namespace Foosball_Tracker
                 addLoss(matchEntry.playerA);
             }
         }
+        //
+        // updates player.dat and matches.dat with what is in playerList and matchList. To
+        // do this, it'll first write brand new files into temp1.dat and temp2.dat. After,
+        // it'll overwrite players.dat and matches.dat with the new files.
+        //
         static public void saveData()
         {
             BinaryWriter bw;
@@ -200,38 +241,64 @@ namespace Foosball_Tracker
             File.Copy("temp1.dat", "players.dat", true);
             File.Copy("temp2.dat", "matches.dat", true);
         }
+        //
+        // Deletes all the data in playerList and matchList, then makes sure the .dat files reflect this change
+        //
         static public void clearData()
         {
             playerList.Clear();
             matchList.Clear();
             foosballList.saveData();
         }
+        //
+        // returns the player at "id", as a player type data
+        //
         static public player getPlayer(int id)
         {
             return playerList[id];
         }
+        //
+        // returns the number of players in playerList
+        //
         static public int playerCount()
         {
             return playerList.Count();
         }
+        //
+        // returns the match at "id", as a match type data
+        //
         static public match getMatch(int id)
         {
             return matchList[id];
         }
+        //
+        // returns the number of matches total in matchList
+        //
         static public int matchCount()
         {
             return matchList.Count();
         }
+        //
+        // returns the number of matches player "id" has played in. It'll take into account
+        // that the last match will always be match '-1
+        //
         static public int playerMatchCount(int id)
         {
             // because there is always a match id of '-1' at end, gotta return 1 less
             return playerList[id].matches.Count() - 1;
         }
+        //
+        // returns the "id'th" match for the player (ie if a player's 3rd match was match #9, it'll
+        // return 9
+        //
         static public int getPlayerMatch(int player, int id)
         {
             return playerList[player].matches[id];
         }
     }
+    //
+    // what the player structures will look like. the player 'id' is simply their position on the playerList
+    //
     public class player
     {
         public string name;			                        // Player's name
@@ -240,6 +307,10 @@ namespace Foosball_Tracker
         public int winRatio;			                    // Player's wins divided by total games (rounded)
         public List<int> matches = new List<int>();			// A list of their matches' IDs
     }
+    //
+    // what the match structures look like. the match 'id' is the position on the matchList. A match id of
+    // -1 means its the end of the "matches" list for player (used for file I/O)
+    //
     public class match
     {
         public int playerA;				            	// The ID of the first player in the match
@@ -247,6 +318,9 @@ namespace Foosball_Tracker
         public int scoreA;				            	// The end score of the first player
         public int scoreB;				            	// The end score of the second player
     }
+    //
+    // main entry of program. initializes the playerList and matchList, as well as opens up the main program form
+    //
     static class Program
     {
 
